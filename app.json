@@ -1,0 +1,14 @@
+{
+  "name": "ng-sample-app",
+  "description": "Basic sample app for beyond official apps. Can be used to integration test official app authentication",
+  "repository": "https://github.com/mduesterhoeft/ng-sample-app",
+  "keywords": ["epages", "beyond"],
+  "env": {
+    "NG_SAMPLE_CLIENT_ID": {
+      "description": "The client id to use against the token endpoint"
+    },
+    "NG_SAMPLE_CLIENT_SECRET": {
+      "description": "The client secret to use against the token endpoint"
+    }
+  }
+}
