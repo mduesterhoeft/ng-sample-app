@@ -5,10 +5,12 @@
   "keywords": ["epages", "beyond"],
   "env": {
     "NG_SAMPLE_CLIENT_ID": {
-      "description": "The client id to use against the token endpoint"
+      "description": "The client id to use against the token endpoint",
+      "required": true
     },
     "NG_SAMPLE_CLIENT_SECRET": {
-      "description": "The client secret to use against the token endpoint"
+      "description": "The client secret to use against the token endpoint",
+      "required": true
     }
   }
 }

@@ -8,12 +8,12 @@ It is useful for testing the oauth authorization code flow.
 
 ## Usage
 
-The client id and secret of the app need to be configured via `ng.sample.clientId` and `ng.sample.clientSecret`.
+The client id and secret of the app need to be configured via `ng.sample.client-id` and `ng.sample.client-secret`.
 
-The callback url that you need to configure on the official app reside under `/authorize-callback`.
+The callback url that you need to configure on the official app resides under `/authorize-callback`.
 
 The app is just able to retrieve products from the [product-management API](https://cdp.epages.works/job/publish-api-docs/Public_REST_API_Documentation/index.html#resources-products-listhttps://cdp.epages.works/job/publish-api-docs/Public_REST_API_Documentation/index.html#resources-products-list).
-Thus it only requires the scope 'products.read'.
+Thus it only requires the scope 'products.read'. 
 
 Sample configuration for an official app configuration for this app:
 ```json
@@ -23,7 +23,8 @@ Sample configuration for an official app configuration for this app:
 	"callbackUrl": "https://warm-mountain-31010.herokuapp.com/authorize-callback"
 }
 ```
+Make sure your official-app has the correct callback url carrying the appropriate app host.
 
 The app is just able to store a single token - so it cannot be used against multiple shops. 
-Once a token is obtained the app provides the ability to retrieve products vis `/products` 
+Once a token is obtained the app provides the ability to retrieve products via `/products` 
 

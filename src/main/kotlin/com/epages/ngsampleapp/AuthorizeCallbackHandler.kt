@@ -17,8 +17,8 @@ import java.util.*
 
 @Component
 class AuthorizeCallbackHandler(val webClient: WebClient,
-                               @Value("\${ng.sample.clientId}") val clientId: String,
-                               @Value("\${ng.sample.clientSecret}") val clientSecret: String,
+                               @Value("\${ng.sample.client.id}") val clientId: String,
+                               @Value("\${ng.sample.client.secret}") val clientSecret: String,
                                val tokenRepository: TokenRepository) {
 
     private val logger = KotlinLogging.logger {}

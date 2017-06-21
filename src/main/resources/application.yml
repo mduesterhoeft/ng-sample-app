@@ -1,0 +1,7 @@
+server:
+  port: 8071
+ng:
+  sample:
+    client:
+      id: 86fffdc4-6f25-499d-a043-4087405f16b9
+      secret: some
