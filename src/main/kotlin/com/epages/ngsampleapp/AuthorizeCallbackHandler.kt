@@ -30,7 +30,7 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
         val tokenUrl = request.queryParam("access_token_url").orElseThrow({ IllegalArgumentException("parameter access_token_url missing") })
 
         logger.info { "received authorization request for tokenUri '$tokenUrl' " }
-
+        logger.info { "using client id $clientId" }
         UriComponentsBuilder.fromUriString(tokenUrl)
         val base64 = String(Base64.getEncoder().encode("$clientId:$clientSecret".toByteArray(Charsets.UTF_8)))
         val response = webClient.post().uri(tokenUrl)
