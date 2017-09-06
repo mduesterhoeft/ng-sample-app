@@ -28,9 +28,11 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
         val apiUrl = request.queryParam("api_url").orElseThrow({ IllegalArgumentException("parameter api_url missing") })
         val returnUrl = request.queryParam("return_url").orElseThrow({ IllegalArgumentException("parameter return_url missing") })
         val tokenUrl = request.queryParam("access_token_url").orElseThrow({ IllegalArgumentException("parameter access_token_url missing") })
+        val signature = request.queryParam("signature").orElse("")
 
         logger.info { "received authorization request for tokenUri '$tokenUrl' " }
         logger.info { "using client id $clientId" }
+        logger.info { "received signature '$signature' " }
         UriComponentsBuilder.fromUriString(tokenUrl)
         val base64 = String(Base64.getEncoder().encode("$clientId:$clientSecret".toByteArray(Charsets.UTF_8)))
         val response = webClient.post().uri(tokenUrl)
@@ -38,7 +40,7 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
                 .header(HttpHeaders.AUTHORIZATION, "Basic " + base64)
                 .header("X-Tenant-Id", "42")
                 .syncBody("code=$code&grant_type=authorization_code")
-                .exchange().log().subscribe()
+                .exchange().log()
 
         return response.flatMap { r ->
             logger.info { "token request status ${r.statusCode()}" }
