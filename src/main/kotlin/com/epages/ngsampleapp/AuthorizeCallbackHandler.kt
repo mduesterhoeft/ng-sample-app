@@ -38,19 +38,18 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
         val response = webClient.post().uri(tokenUrl)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.AUTHORIZATION, "Basic " + base64)
-                .header("X-Tenant-Id", "42")
                 .syncBody("code=$code&grant_type=authorization_code")
                 .exchange().log()
 
         return response.flatMap { r ->
             logger.info { "token request status ${r.statusCode()}" }
-                val tokenResponse: Mono<TokenResponse> = r.bodyToMono()
-                tokenResponse.flatMap {t ->
-                    tokenRepository.token = Token(apiUrl, t.accessToken, t.refreshToken)
-                    logger.info { "token obtained for $apiUrl" }
-                    ServerResponse.seeOther(URI.create(returnUrl)).build()
-                }
+            val tokenResponse: Mono<TokenResponse> = r.bodyToMono()
+            tokenResponse.flatMap {t ->
+                tokenRepository.token = Token(apiUrl, t.accessToken, t.refreshToken)
+                logger.info { "token obtained for $apiUrl" }
+                ServerResponse.seeOther(URI.create(returnUrl)).build()
             }
+        }
     }
 
     data class TokenResponse(
