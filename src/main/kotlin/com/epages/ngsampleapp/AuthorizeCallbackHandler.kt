@@ -46,7 +46,7 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
                 .syncBody("code=$code&grant_type=authorization_code")
                 .exchange().log()
 
-        return if (validateSignature(signature, request.uri().query, clientSecret)) {
+        return if (validateSignature(signature, request.uri().query.substringBeforeLast("&signature"), clientSecret)) {
             response.flatMap { r ->
                 logger.info { "token request status ${r.statusCode()}" }
                 val tokenResponse: Mono<TokenResponse> = r.bodyToMono()
