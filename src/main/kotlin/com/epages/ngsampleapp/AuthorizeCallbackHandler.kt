@@ -1,5 +1,6 @@
 package com.epages.ngsampleapp
 
+import com.epages.ngsampleapp.SignatureValidator.validateSignature
 import com.fasterxml.jackson.annotation.JsonProperty
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
@@ -14,8 +15,6 @@ import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.net.URI
 import java.util.*
-import javax.crypto.Mac
-import javax.crypto.spec.SecretKeySpec
 
 @Component
 class AuthorizeCallbackHandler(val webClient: WebClient,
@@ -24,8 +23,6 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
                                val tokenRepository: TokenRepository) {
 
     private val logger = KotlinLogging.logger {}
-
-    private val hmacAlgorithm = "HmacSHA1"
 
     fun processAuthorizeCallback(request: ServerRequest): Mono<ServerResponse> {
         val code = request.queryParam("code").orElseThrow({ IllegalArgumentException("parameter code missing") })
@@ -37,7 +34,7 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
         logger.info { "received authorization request for tokenUri '$tokenUrl' " }
         logger.info { "using client id $clientId" }
         logger.info { "received signature '$signature' " }
-        logger.info { "request query '${request.uri().query}' " }
+        logger.info { "request query '${request.uri().rawQuery}' " }
         UriComponentsBuilder.fromUriString(tokenUrl)
         val base64 = String(Base64.getEncoder().encode("$clientId:$clientSecret".toByteArray(Charsets.UTF_8)))
         val response = webClient.post().uri(tokenUrl)
@@ -46,7 +43,7 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
                 .syncBody("code=$code&grant_type=authorization_code")
                 .exchange().log()
 
-        return if (validateSignature(signature, request.uri().query.substringBeforeLast("&signature"), clientSecret)) {
+        return if (validateSignature(signature, request.uri().rawQuery, clientSecret)) {
             response.flatMap { r ->
                 logger.info { "token request status ${r.statusCode()}" }
                 val tokenResponse: Mono<TokenResponse> = r.bodyToMono()
@@ -67,16 +64,6 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
             @JsonProperty("refresh_token") val refreshToken: String
     )
 
-    fun validateSignature(signature: String, requestQuery: String, clientSecret: String): Boolean {
-        return signature == calculateHMAC(requestQuery, clientSecret)
-    }
 
-    private fun calculateHMAC(data: String, key: String): String {
-        val signingKey = SecretKeySpec(key.toByteArray(), hmacAlgorithm)
-        val mac = Mac.getInstance(hmacAlgorithm)
-        mac.init(signingKey)
-
-        return Base64.getEncoder().encodeToString(mac.doFinal(data.toByteArray()))
-    }
 
 }
