@@ -37,6 +37,7 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
         logger.info { "received authorization request for tokenUri '$tokenUrl' " }
         logger.info { "using client id $clientId" }
         logger.info { "received signature '$signature' " }
+        logger.info { "request query '${request.uri().query}' " }
         UriComponentsBuilder.fromUriString(tokenUrl)
         val base64 = String(Base64.getEncoder().encode("$clientId:$clientSecret".toByteArray(Charsets.UTF_8)))
         val response = webClient.post().uri(tokenUrl)
@@ -45,8 +46,8 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
                 .syncBody("code=$code&grant_type=authorization_code")
                 .exchange().log()
 
-        if (validateSignature(signature, request.uri().rawQuery, clientSecret)) {
-            return response.flatMap { r ->
+        return if (validateSignature(signature, request.uri().query, clientSecret)) {
+            response.flatMap { r ->
                 logger.info { "token request status ${r.statusCode()}" }
                 val tokenResponse: Mono<TokenResponse> = r.bodyToMono()
                 tokenResponse.flatMap {t ->
@@ -57,7 +58,7 @@ class AuthorizeCallbackHandler(val webClient: WebClient,
             }
         } else {
             logger.error("signature invalid")
-            return ServerResponse.badRequest().build()
+            ServerResponse.badRequest().build()
         }
     }
 
